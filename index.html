@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주차장법 정리 · 교평 대상 계산</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="hero-main">
+          <div class="hero-text">
+            <p class="eyebrow">Seoul + Gyeonggi Parking Ordinance Desk</p>
+            <h1>주차장법 정리와 교평 대상(swa값) 계산</h1>
+            <p class="hero-note">
+              지금까지 정리한 주차장법 화면을 보존하고,
+              다음 단계 작업으로 넘어갈 수 있게 선택 구조를 나눴습니다.
+            </p>
+          </div>
+        </div>
+        <section class="mode-switcher" aria-label="작업 선택">
+          <p class="section-kicker">작업 선택</p>
+          <div class="mode-switcher-grid">
+            <button type="button" class="mode-option active" data-workspace-mode="parking-laws">
+              <span class="mode-option-index">1. 주차장법 정리</span>
+            </button>
+            <button type="button" class="mode-option" data-workspace-mode="traffic-review">
+              <span class="mode-option-index">2. 교평 대상(swa값) 계산</span>
+            </button>
+          </div>
+        </section>
+        <p class="panel-footnote">
+          법제처 자치법규 기준 출처를 우선 연결하고, 입력값에 따라 적용 모수와 설치비율을 함께 보여줍니다.
+        </p>
+        <div class="hero-shared-address">
+          <label for="shared-address">
+            <span>주소지</span>
+            <input id="shared-address" name="sharedAddress" type="text" placeholder="예: 서울특별시 성동구 왕십리로 222">
+          </label>
+        </div>
+      </div>
+
+      <section class="card input-card hero-input-card" data-screen="parking-laws">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">주차장법 정리</p>
+            <h2>관할 찾기 + 설치비율 계산</h2>
+          </div>
+          <button type="submit" form="parking-form" class="inline-action">관할 및 비율 계산</button>
+        </div>
+
+        <form id="parking-form" class="parking-form">
+          <div class="form-grid">
+            <label>
+              <span>법정주차대수</span>
+              <input id="legal-count" name="legalCount" type="number" min="0" step="1" placeholder="예: 120">
+            </label>
+
+            <label>
+              <span>계획주차대수</span>
+              <input id="planned-count" name="plannedCount" type="number" min="0" step="1" placeholder="예: 138">
+            </label>
+
+            <label>
+              <span>기계식 제외 대수</span>
+              <input id="non-mechanical-count" name="nonMechanicalCount" type="number" min="0" step="1" placeholder="미입력 시 계획주차대수 사용">
+            </label>
+          </div>
+        </form>
+
+        <div id="match-summary" class="match-summary empty">
+          주소를 입력하면 서울특별시, 서울 자치구, 경기도 시군 중 관할을 찾아 표시합니다.
+        </div>
+      </section>
+
+      <section class="card input-card hero-input-card" data-screen="traffic-review" hidden>
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">교평 대상(swa값) 계산</p>
+            <h2>서울시 교통영향평가 대상 및 교차로 개수 계산</h2>
+          </div>
+          <button type="submit" form="traffic-review-form" class="inline-action">대상 여부 계산</button>
+        </div>
+        <form id="traffic-review-form" class="parking-form">
+          <div class="form-grid traffic-form-grid traffic-selector-grid">
+            <label>
+              <span>사업 구분</span>
+              <select id="traffic-project-kind" name="trafficProjectKind">
+                <option value="building">건축물</option>
+                <option value="development">개발사업</option>
+              </select>
+            </label>
+
+            <label data-traffic-field="building-type">
+              <span>건축물 세부용도</span>
+              <select id="traffic-building-type" name="trafficBuildingType"></select>
+            </label>
+
+            <label data-traffic-field="development-type" hidden>
+              <span>개발사업 유형</span>
+              <select id="traffic-development-type" name="trafficDevelopmentType"></select>
+            </label>
+          </div>
+
+          <div id="traffic-mixed-use-builder" class="traffic-mixed-use-builder" hidden>
+            <div class="traffic-mixed-use-head">
+              <div>
+                <strong>복합용도 건축물 입력</strong>
+                <p class="small-note">공식식: Swa = Σ(Pia / Mia) x 10,000. Pia는 각 용도별 면적, Mia는 해당 용도의 최소 교통영향평가 대상규모입니다.</p>
+              </div>
+              <button type="button" id="traffic-mixed-use-add" class="traffic-mini-action">용도 추가</button>
+            </div>
+            <div id="traffic-mixed-use-rows" class="traffic-mixed-use-rows"></div>
+          </div>
+
+          <div class="form-grid traffic-form-grid">
+            <label>
+              <span>건축 연면적(㎡)</span>
+              <input id="traffic-gross-floor-area" name="trafficGrossFloorArea" type="number" min="0" step="1" placeholder="예: 12000">
+            </label>
+
+            <label>
+              <span>부지면적(㎡)</span>
+              <input id="traffic-site-area" name="trafficSiteArea" type="number" min="0" step="1" placeholder="예: 55000">
+            </label>
+
+            <label>
+              <span>관람석 수(석)</span>
+              <input id="traffic-seats" name="trafficSeats" type="number" min="0" step="1" placeholder="예: 1800">
+            </label>
+          </div>
+
+          <div class="form-grid traffic-form-grid">
+            <label>
+              <span>도로 총길이(km)</span>
+              <input id="traffic-road-length" name="trafficRoadLength" type="number" min="0" step="0.1" placeholder="도로 개발사업 선택 시 입력">
+            </label>
+          </div>
+        </form>
+
+        <div id="traffic-review-summary" class="match-summary empty">
+          서울 주소를 입력하면 도시교통정비지역 여부를 먼저 판단하고, 서울시 공식 기준표에 따라 대상 여부와 분석 교차로 개수를 계산합니다.
+        </div>
+      </section>
+    </header>
+
+    <main class="layout">
+      <section class="card result-card" data-screen="parking-laws">
+        <div class="section-head">
+          <p class="section-kicker">지역별 규칙 보기</p>
+          <h2>해당 지역 주차 규칙 한눈에 보기</h2>
+        </div>
+        <div id="rule-results" class="rule-results empty">
+          아직 계산된 결과가 없습니다.
+        </div>
+      </section>
+
+      <section class="card directory-card" data-screen="parking-laws">
+        <div class="section-head">
+          <p class="section-kicker">조례 디렉터리</p>
+          <h2>서울특별시 · 서울 자치구 · 경기도 시군</h2>
+        </div>
+        <div class="directory-controls">
+          <input id="directory-filter" type="text" placeholder="예: 성남, 강남구, 용인">
+        </div>
+        <div id="directory-root" class="directory-root"></div>
+      </section>
+
+      <section class="card result-card" data-screen="traffic-review" hidden>
+        <div class="section-head">
+          <p class="section-kicker">교평 대상(swa값) 계산</p>
+          <h2>서울시 교통영향평가 계산 결과</h2>
+        </div>
+        <div id="traffic-review-results" class="rule-results empty">
+          아직 계산된 결과가 없습니다.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
