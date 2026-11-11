@@ -35,7 +35,6 @@
 ※ 실제 인허가 검토 전에는 해당 관할의 최신 조례 원문을 반드시 다시 확인하세요.
 ```
 
-- 썸네일(`og:image`)이 아직 없음 → 1200×630 PNG를 저장소 루트에 `og-image.png`로 올리고
-  `index.html`의 주석 자리에 아래 줄을 넣는다.
-  `<meta property="og:image" content="https://danba1229.github.io/tia-parkinglaws-and-swa/og-image.png">`
+- 썸네일: 저장소 루트 `og-image.png`(1200×630) → `og:image`로 연결됨.
+  디자인 원본은 HTML로 만들어 headless Chrome으로 캡처했다. 문구를 바꾸면 다시 캡처해서 교체.
 - 네이버는 링크 카드를 캐시하므로, OG 태그 반영 후 처음 붙여넣기 전에 배포가 끝났는지 확인한다.
